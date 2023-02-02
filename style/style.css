@@ -4,12 +4,90 @@
     box-sizing: border-box;
 }
 
-button {
-    padding: 5px 10px;
+body {
+    font-family: sans-serif;
 }
 
-.matrix-container input {
+@font-face {
+    font-family: 'Latex';
+    src: url('../font/KaTeX_Math-Italic.woff2');
+    font-weight: 400;
+    font-style: italic;
+}
+
+.button {
+    width: 60px;
+    height: 40px;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.equation-system {
+    margin-top: 20px;
+}
+
+.matrix-container {
+    overflow: hidden;
+    font-size: 1.1rem;
+    font-family: 'Latex', Courier, monospace;
+}
+
+.matrix { 
+    margin: 20px 0;
+}
+
+.matrix > tr > td > span {
+    display: inline-block;
     width: 40px;
-    height: 20px;
-    outline: none;
+    text-align: center;
+}
+
+.inputCell {
+    padding: 5px;
+    width: 45px;
+    border: 1px solid;
+    border-radius: 5px;
+    background-color: rgb(241, 241, 241);
+}
+
+.button:hover {
+    background-color: rgb(223, 220, 220);
+}
+
+.resultsContainer {
+    margin-bottom: 30px;
+}
+
+.results {
+    margin-bottom: 20px;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: rgb(241, 241, 241);
+    text-align: center;
+}
+
+.results > div {
+    margin: 10px 0;
+}
+
+@media (max-width: 600px) {
+    .matrix-container {
+        overflow: scroll;
+    }
+
+    .equation-system {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
+
+@media (min-width: 601px) {
+    .equation-system {
+        display: flex;
+        align-items: center;
+        flex-flow: column wrap;
+    }
 }

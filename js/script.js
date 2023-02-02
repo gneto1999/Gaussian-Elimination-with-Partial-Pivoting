@@ -1,167 +1,273 @@
-const MATRIX = document.createElement('table')
-const MATRIX_CONTAINER = document.createElement('div')
-MATRIX_CONTAINER.classList.add('matrix-container')
-const EQ_SYS = document.querySelector('.equation-system')
+const btnAddLinesAndCells = document.querySelector('#add-cells')
+const btnDelLinesAndCells = document.querySelector('#remove-cells')
+const btnResetLinesAndCells = document.querySelector('#reset-cells')
+const btnSolveSystemEquation = document.querySelector('#solve')
 
-const BTN_ADD_CELLS = document.querySelector('#add-cells')
-const BTN_REM_CELLS = document.querySelector('#remove-cells')
-const BTN_RESET_CELLS = document.querySelector('#reset-cells')
-const BTN_SOLVE = document.querySelector('#solve')
+class Matrix {
+    #matrix 
+    #matrixContainer
+    #eqSystem
+    #numLines
 
-let numCells = 3;
+    constructor(numLines){
+        this.#matrix = document.createElement('table')
+        this.#matrixContainer = document.createElement('div')
+        this.#matrixContainer.classList.add('matrix-container')
+        this.#eqSystem = document.querySelector('.equation-system')
 
-function changeOperator(prevElem, curElem, numberEqt){
-    if(prevElem){
-        prevElem.textContent = `x${numberEqt-1}+`
+        this.#numLines = numLines
     }
-    curElem.textContent = `x${numberEqt}=`
-}
 
-function createMatrix(numberEqt) {
-    for(i = 0; i < numberEqt; i++) {
-        const TR = document.createElement('tr')
-        let lines = ''
-
-        for(j = 1; j <= numberEqt; j++){
-            lines += `\n<td><input type="text"></td>\n<td><span>x${j}+</span></td>`
-            if(j == numberEqt) {
-                lines += '<td><input type="text"></td>'
-                TR.innerHTML = lines
-            }
+    changeOperator(prevElem, curElem, numCells){
+        if(prevElem){
+            prevElem.innerHTML = `x<sub>${numCells-1}</sub> +`
         }
-
-        changeOperator(TR.querySelectorAll('span')[1], TR.querySelectorAll('span')[2], numberEqt)
-
-        MATRIX.appendChild(TR)
-        MATRIX.classList.add('matrix')
-        MATRIX_CONTAINER.appendChild(MATRIX)
-        EQ_SYS.insertBefore(MATRIX_CONTAINER, document.querySelector('#solve'))
+        curElem.innerHTML = `x<sub>${numCells}</sub> =`
     }
-}
 
-function addCells(){
-    if(numCells < 10){
-        const TROWS = document.querySelectorAll('tr')
-        const TR = document.createElement('tr')
-        const TD = document.createElement('td')
-        let line = ''
-        numCells++
+    createMatrix() {
+        const NUM_LINES = this.#numLines
+        for(let i = 0; i < NUM_LINES; i++) {
+            const tr = document.createElement('tr')
+            let lines = ''
+    
+            for(let j = 1; j <= NUM_LINES; j++){
+                lines += `\n<td><input type="text" autofocus class="inputCell"></td>\n<td><span>x<sub>${j}</sub> +</span></td>`
+                if(j == NUM_LINES) {
+                    lines += '<td><input type="text" class="inputCell"></td>'
+                    tr.innerHTML = lines
+                }
+            }
 
-        // Add celulas as colunas
-        TROWS.forEach(trow => {
-            const TD_INPUT = TD.cloneNode(false)
-            const TD_VAR = TD.cloneNode(false)
-            const SPAN = document.createElement('span')
-            const INPUT = document.createElement('input')
+            this.changeOperator(tr.querySelectorAll('span')[1], tr.querySelectorAll('span')[2], NUM_LINES)
             
-            trow.querySelectorAll('SPAN')[numCells-2].textContent = `x${numCells-1}+`
-            SPAN.textContent = `x${numCells}=`
+            this.#matrix.appendChild(tr)
+            this.#matrix.classList.add('matrix')
+        }
+        this.#matrixContainer.appendChild(this.#matrix)
+        // this.#eqSystem.insertBefore(this.#matrixContainer, document.querySelector('#solve'))
+        this.#eqSystem.insertAdjacentElement('beforeend', this.#matrixContainer)
+    }
+
+    addCells = () => {
+        if(this.#numLines < 7){
+            const trows = document.querySelectorAll('tr')
+            const tr = document.createElement('tr')
+            const td = document.createElement('td')
+            let line = ''
+            this.#numLines++
+    
+            // Add celulas as colunas
+            trows.forEach(trow => {
+                const tdInput = td.cloneNode(false)
+                const tdVar = td.cloneNode(false)
+                const span = document.createElement('span')
+                const input = document.createElement('input')
+                input.classList.add('inputCell')
+                
+                trow.querySelectorAll('span')[this.#numLines-2].textContent = `x${this.#numLines-1} + `
+                span.textContent = `$x_${this.#numLines} = $`
+                
+                this.changeOperator(trow.querySelectorAll('span')[this.#numLines-2], span, this.#numLines)
+    
+                tdInput.appendChild(input)
+                tdVar.appendChild(span)
+                trow.append(tdVar, tdInput)
+            })
+        
+            // Add linha
+            for(let i = 1; i <= this.#numLines; i++){
+                line += `\n<td><input type="text" class="inputCell"></td>\n<td><span>x<sub>${i}</sub> +</span>\n</td>`
+                if(i == this.#numLines){
+                    line += '<td><input type="text" class="inputCell"></td>'
+                    tr.innerHTML = line
+                }
+            }
+
+            this.changeOperator(tr.querySelectorAll('span')[this.#numLines-2], tr.querySelectorAll('span')[this.#numLines-1], this.#numLines)
+            this.#matrix.appendChild(tr)
+        }
+    }
+    
+    removeCells = () => {
+        if(this.#numLines > 2){
+            const tr = document.querySelectorAll('tr')
+            this.#numLines--
+
+            // Remove celulas das colunas
+            tr.forEach(trow => {
+                let lastCell = trow.lastChild
+                let lastVariable = lastCell.previousSibling
+                this.changeOperator(undefined, trow.querySelectorAll('span')[this.#numLines-1], this.#numLines)
+                lastCell.remove()
+                lastVariable.remove()
+            })
+
+            // Remove linha
+            let lastTr = this.#matrix.lastChild
+            lastTr.remove()
+        }
+    }
+    
+    resetCells(){
+        document.querySelectorAll('td > input').forEach(input => input.value = '')
+    }    
+
+}
+
+class gaussEliminationPartialPivoting {
+    #matrixU
+
+    buildingMatrix = () => {
+        this.#matrixU = []
+        // this.#matrixU = [[8, 6, -1, 0], [2, 1, 1, 3], [6, 9, -5, -13]]
+        // this.#matrixU = [[1, -1, 2, 2], [2, -2, -1, 4], [-2, -5, 3, 3]]
+        // this.#matrixU = [[1, 1, 1, 3], [2, -1, 3, 4], [5, 3, -6, 2]]
+        this.#matrixU = [[2, 3, 1, 1, 7], [4, 7, 4, 3, 1], [4, 7, 6, 4, 4], [6, 9, 9, 8, 12]]
+        // const inputs = document.querySelectorAll('td > input')
+        // const rowsNumberMatrix = document.querySelectorAll('table > tr').length
+
+        // for(let i = 0; i < rowsNumberMatrix; i++){
+        //     let arr = []
+        //     for (let j = i * (rowsNumberMatrix + 1); j < (i + 1) * (rowsNumberMatrix + 1); j++) {
+        //         arr.push(Number(inputs[j].value))
+        //     }
+        //     this.#matrixU.push(arr)
+        // }
+        
+        this.#scalingMatrix()
+    }
+
+    #scalingMatrix(){
+        const N = this.#matrixU.length
+        const results = []
+        const originalMatrix = JSON.parse(JSON.stringify(this.#matrixU))
+        let lineIndex, aux, multipliers
+        for(let k = 0; k < N; k++){
+            const scallingProcess = {}
+            let maxPivot = 0
+
+            for(let j = k; j < N; j++){
+                if(Math.abs(this.#matrixU[j][k]) > Math.abs(maxPivot)){
+                    maxPivot = this.#matrixU[j][k];
+                    lineIndex = j;
+                }
+            }
+ 
+            if(lineIndex !== k){
+                aux = this.#matrixU[k]
+                this.#matrixU[k] = this.#matrixU[lineIndex]
+                this.#matrixU[lineIndex] = aux
+            }     
             
-            changeOperator(trow.querySelectorAll('SPAN')[numCells-2], SPAN, numCells)
+            scallingProcess.maxPivot = maxPivot
+            scallingProcess.lineIndex = lineIndex
+            scallingProcess.swapMatrix = JSON.parse(JSON.stringify(this.#matrixU))
+            scallingProcess.multipliers = []
+            scallingProcess.multipliersLines = []
+            
+            for(let j = k+1; j < N; j++){
+                multipliers = this.#matrixU[j][k]/this.#matrixU[k][k]
 
-            TD_INPUT.appendChild(INPUT)
-            TD_VAR.appendChild(SPAN)
-            trow.append(TD_VAR, TD_INPUT)
-        })
-    
-        // Add linha
-        for(i = 1; i <= numCells; i++){
-            line += `<td><input type="text"></td><td><span>x${i}+</span></td>`
-            if(i == numCells){
-                line += '<td><input type="text"></td>'
+                scallingProcess.multipliers.push(multipliers)
+                scallingProcess.multipliersLines.push(j+1)
+
+                for(let i = 0; i < N+1; i++){
+                    this.#matrixU[j][i] -= multipliers*this.#matrixU[k][i]
+                }
             }
+
+            scallingProcess.matrixUResult = JSON.parse(JSON.stringify(this.#matrixU))
+            results.push(scallingProcess)
         }
-
-        TR.innerHTML = line
-
-        changeOperator(TR.querySelectorAll('span')[numCells-2], TR.querySelectorAll('span')[numCells-1], numCells)
-        MATRIX.appendChild(TR)
+        results[0].original = originalMatrix
+        console.log(results)
+        this.#solution(N, results)
     }
-}
 
-function removeCells(){
-    if(numCells > 2){
-        const TR = document.querySelectorAll('tr')
-        numCells--
-        // Remove celulas das colunas
-        TR.forEach(trow => {
-            let lastCell = trow.lastChild
-            let lastVariable = lastCell.previousSibling
-            changeOperator(undefined, trow.querySelectorAll('span')[numCells-1], numCells)
-            lastCell.remove()
-            lastVariable.remove()
-        })
-        // Remove linha
-        let lastTr = MATRIX.lastChild
-        lastTr.remove()
-    }
-}
-
-function resetCells(){
-    document.querySelectorAll('td > input').forEach(input => input.value = '')
-}
-
-BTN_ADD_CELLS.addEventListener('click', addCells)
-BTN_REM_CELLS.addEventListener('click', removeCells)
-BTN_RESET_CELLS.addEventListener('click', resetCells)
-
-createMatrix(numCells)
-
-// Gauss elimination with pivoting partial
-function gaussPivotingPartial(){
-    const inputs = Array.from(document.querySelectorAll('td > input'))
-    const rowsNumberMatrix = document.querySelectorAll('table > tr').length
-    const matrixU = []
-    const vectorSolution = []
-    let lineIndice = 0, aux, multipliers
-    // const matrixA = [[1, -1, 2, 2], [2, -2, -1, 4], [-2, -5, 3, 3]]
-    // const matrixA = [[1, 1, 1, 1], [2, 1, -1, 0], [2, 2, 1, 1]]
-    // const matrixA = [[2, 1, 1, 0, 1], [4, 3, 3, 1, 2], [8, 7, 9, 5, 4], [6, 7, 9, 8, 5]]
-    
-    for(let i = 0; i < rowsNumberMatrix; i++){
-        let arr = []
-        for(let j = i*(rowsNumberMatrix+1); j < (i+1)*(rowsNumberMatrix+1); j++){
-            arr.push(Number(inputs[j].value))
-        }
-        matrixU.push(arr)
-    }
-    
-    // const matrixU = [...matrixA]
-    const N = matrixU.length
-
-    for(let k = 0; k < N; k++){
-        let maxPivot = 0
-        for(let j = k; j < N; j++){
-            if(Math.abs(matrixU[j][k]) > maxPivot){
-                maxPivot = matrixU[j][k];
-                lineIndice = j;
+    #solution(N, results){
+        const matrixU = this.#matrixU
+        const vectorSolution = []
+        vectorSolution[N-1] = Number((matrixU[N-1][N] / matrixU[N-1][N-1]).toFixed(15))
+        for(let i = N-2; i >= 0; i--){
+            let sum = 0
+            for(let j = i+1; j < N; j++){
+                sum += matrixU[i][j]*vectorSolution[j]
             }
+            vectorSolution[i] = (matrixU[i][N] - sum)/matrixU[i][i]
+        }
+        results.push(vectorSolution)
+        this.#displayResult(results)
+    }
+    
+    #displayResult(results){        
+        const eqSystem = document.querySelector('.equation-system')
+        const resultsContainer = document.createElement('div')
+        resultsContainer.classList.add('resultsContainer')
+
+        function matrixJsToMatrixKatex(mtx){
+            let str = ''
+            mtx.forEach(m => {
+                str += m.join(',')
+                str = str.replaceAll(',', '&').split('')
+                str.push(String.raw`\\`)
+                str = str.join('')
+            })
+            return str
         }
         
-        if(lineIndice !== k){
-            aux = matrixU[k]
-            matrixU[k] = matrixU[lineIndice]
-            matrixU[lineIndice] = aux
-        }     
+        let strHtmlResults = ''
+        strHtmlResults += `<div id="original-matrix" class="results">
+        <div>$\\begin{bmatrix}${matrixJsToMatrixKatex(results[0].original)}\\end{bmatrix}$</div>
+        </div>`
         
-        for(let j = k+1; j < N; j++){
-            multipliers = matrixU[j][k]/matrixU[k][k]
-            for(let i = 0; i < N+1; i++){
-                matrixU[j][i] -= multipliers*matrixU[k][i]
+        results.forEach((r, i) => {
+            if(i < results.length-2){
+                strHtmlResults += `
+                    <div class="results">
+                    <div>max pivô: $${r.maxPivot}$</div>
+                    <div>$L_${i+1} \\leftrightarrows L_${r.lineIndex+1}$</div>
+                    <div>$\\begin{bmatrix}${matrixJsToMatrixKatex(r.swapMatrix)}\\end{bmatrix}$</div>
+                    `
+                r.multipliers.forEach((mult, j) =>{
+                    if(mult !== undefined){
+                        strHtmlResults += `<div>$m_${r.multipliersLines[j]}$$_${i+1}$: $${mult}$</div>`
+                    }
+                })
+
+                r.multipliers.forEach((multi, j) =>{
+                    if(multi !== undefined){
+                        strHtmlResults += `<div>$L_${r.multipliersLines[j]} = L_${r.multipliersLines[j]} \\times (${multi})L_${i+1}$</div>`
+                    }
+                })
+
+                strHtmlResults += `
+                    <div>$\\begin{bmatrix}${matrixJsToMatrixKatex(r.matrixUResult)}\\end{bmatrix}$</div></div>
+                `
+            } else if(r.length){
+                strHtmlResults += `<div id="vectorSolution" class="results">$x = \\begin{bmatrix}${Array.from(r).join(',').replaceAll(',', String.raw`\\`)}\\end{bmatrix}$</div>`
             }
+        })
+
+        resultsContainer.innerHTML = strHtmlResults
+
+        if(eqSystem.lastElementChild === document.querySelector('.resultsContainer')){
+            eqSystem.lastElementChild.remove()
         }
+        document.querySelector('.equation-system').insertAdjacentElement('beforeend', resultsContainer)
+
+        renderMathInElement(resultsContainer, {
+            delimiters: [{left: '$', right: '$', display: false}],
+            throwOnError : false
+        })
     }
-    
-    vectorSolution[N-1] = Number((matrixU[N-1][N] / matrixU[N-1][N-1]).toFixed(15))
-    for(let i = N-2; i >= 0; i--){
-        let sum = 0
-        for(let j = i+1; j < N; j++){
-            sum += matrixU[i][j]*vectorSolution[j]
-        }
-        vectorSolution[i] = (matrixU[i][N] - sum)/matrixU[i][i]
-    }
-    console.log(matrixU)
-    console.log(vectorSolution)
 }
 
-BTN_SOLVE.addEventListener('click', gaussPivotingPartial)
+const matrix = new Matrix(3)
+matrix.createMatrix()
+btnAddLinesAndCells.addEventListener('click', matrix.addCells)
+btnDelLinesAndCells.addEventListener('click', matrix.removeCells)
+btnResetLinesAndCells.addEventListener('click', matrix.resetCells)
+
+const gaussWithPartialPivoting = new gaussEliminationPartialPivoting
+btnSolveSystemEquation.addEventListener('click', gaussWithPartialPivoting.buildingMatrix)

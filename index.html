@@ -5,23 +5,40 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style/style.css">
-    <title>Document</title>
+    <title>Gauss Elimination with Partial Pivoting</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css" integrity="sha384-vKruj+a13U8yHIkAyGgK1J3ArTLzrFGBbBc0tDp4ad/EyewESeXE/Iv67Aj8gKZ0" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js"
+        integrity="sha384-PwRUT/YqbnEjkZO0zZxNqcxACrXe+j766U2amXcgMg5457rve2Y7I6ZJSm2A0mS4"
+        crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js"
+        integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05"
+        crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            renderMathInElement(document.body, {
+                // customised options
+                // • auto-render specific keys, e.g.:
+                delimiters: [
+                    { left: '$$', right: '$$', display: true },
+                    { left: '$', right: '$', display: false },
+                    { left: '\\(', right: '\\)', display: false },
+                    { left: '\\[', right: '\\]', display: true }
+                ],
+                // • rendering keys, e.g.:
+                throwOnError: false
+            });
+        });
+    </script>
 </head>
 <body>
     <div class="equation-system">
         <div class="btn-matrix">
-            <button type="button" id="add-cells">+</button>
-            <button type="button" id="remove-cells">-</button>
-            <button type="button" id="reset-cells">Reset</button>
+            <button type="button" class="button" id="add-cells">+</button>
+            <button type="button" class="button" id="remove-cells">-</button>
+            <button type="button" class="button" id="reset-cells">Reset</button>
+            <button type="button" class="button" id="solve">Solve</button>
         </div>
-
-        <button type="button" id="solve">Solve</button>
     </div>
-    <!-- <div class="matrix-container">
-        <table class="matrix">
-            
-        </table>
-    </div> -->
     <script src="js/script.js"></script>
 </body>
 </html>

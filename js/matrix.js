@@ -27,9 +27,9 @@ class Matrix {
             let lines = ''
             
             for(let j = 1; j <= NUM_LINES; j++){
-                lines += `\n<td><input type="text" autofocus class="inputCell"></td>\n<td><span>x<sub>${j}</sub> +</span></td>`
+                lines += `\n<td><input type="number" autofocus class="inputCell"></td>\n<td><span>x<sub>${j}</sub> +</span></td>`
                 if(j == NUM_LINES) {
-                    lines += '<td><input type="text" class="inputCell"></td>'
+                    lines += '<td><input type="number" class="inputCell"></td>'
                     tr.innerHTML = lines
                 }
             }
